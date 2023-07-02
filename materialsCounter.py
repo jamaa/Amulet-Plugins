@@ -6,9 +6,11 @@ from amulet_map_editor.programs.edit.api.behaviour import BlockSelectionBehaviou
 import wx
 import re
 from amulet_map_editor.api.wx.ui.base_select import BaseSelect
+from amulet.api.block import Block
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
     from amulet_map_editor.programs.edit.api.canvas import EditCanvas
+
 class PluginClassName(wx.Panel, DefaultOperationUI):
     def __init__(
             self,
@@ -32,34 +34,52 @@ class PluginClassName(wx.Panel, DefaultOperationUI):
 
     def _run_count(self, _):
 
+        # list of block properties to consider
+        properties = [
+            "material",
+            "color",
+            "plant_type",
+            "stripped",
+        ]
+
         block_version = self.world.level_wrapper.version
 
         block_platform = "universal"
 
-        matrials = collections.defaultdict(list)
+        materials = collections.defaultdict(int)
         selection = self.canvas.selection.selection_group.selection_boxes
-        text = ''
-        print('ok')
+
         for g in selection:
             for b in g:
-                name, ent = self.world.get_version_block(b[0],b[1],b[2],self.canvas.dimension, (block_platform, block_version))
-                clean_name = str(name.properties.get('material')).replace('None', '')
-                clean_name += str(name.properties.get('plant_type')).replace('None', '')
-                if clean_name != '':
-                    clean_name += ' '
-                clean_name +=  name.base_name
-                print(name.properties)
-                # clean_name_t = name.replace("[material=\""," ").replace('",type="bottom"]','').replace('",type="top"]','')\
-                #     .replace('[color="',' ').replace('"]', '').replace("[",' ').replace('"','').replace('east','')\
-                #                  .replace('north','').replace('south','').replace('west','').replace('=','')\
-                #                  .replace('true','').replace('false','').replace(',','').replace('universal_minecraft','')\
-                #                    .replace('{','').replace('age','').replace('halflower','').replace('halfupper','').replace(' ','')\
-                #                .replace('fallingflowinglevel','')+": "
-                # clean_name = re.sub(r'[0-9]+', '', clean_name_t)
-                #print(name)
-                matrials[clean_name].append(clean_name)
-        for x in matrials.keys():
-            text += str(x)  +" " + str(len(matrials[x])) + "\n"
+                block, ent = self.world.get_version_block(b[0],b[1],b[2],self.canvas.dimension, (block_platform, block_version))
+
+                name = block.base_name
+
+                if isinstance(block, Block):
+
+                    # collect block properties
+                    block_props = {}
+                    for prop_name in properties:
+                        if prop_name in block.properties:
+                            block_props[prop_name] = block.properties[prop_name]
+
+                    if len(block_props) > 0:
+                        # format properties as a nice string and add it to the name
+                        name += " {"
+                        name += ", ".join([f"{prop}: {value}" for prop, value in block_props.items()])
+                        name += "}"
+                
+                else:
+                    # block entities and entities have no properties
+                    pass
+
+                # increment counter
+                materials[name] += 1
+
+        # output materials sorted alphabetically
+        text = ''
+        for name in sorted(list(materials.keys())):
+            text += f"{name}: {materials[name]}\n"
 
         self.text.SetValue(text)
 
