@@ -1,45 +1,14 @@
-import json
-from typing import TYPE_CHECKING, Tuple
-from amulet.api.data_types import Int, BiomeType
-import collections
-import PyMCTranslate
+from typing import TYPE_CHECKING
 import amulet_nbt
-import amulet_nbt as nbt
 import wx
 import wx.grid
-import sys
-import struct
-import numpy
 from amulet.api.block import Block
-from amulet.api.block_entity import BlockEntity
-from amulet.api.data_types import Dimension
-from amulet.api.selection import SelectionBox
-from amulet.api.selection import SelectionGroup
-from amulet.api.wrapper import Interface, EntityIDType, EntityCoordType
-from amulet.libs.leveldb.leveldb import LevelDB
-from amulet.utils import block_coords_to_chunk_coords
-from amulet_map_editor.api import image
-from amulet_map_editor.api.wx.ui.base_select import BaseSelect
 from amulet_map_editor.api.wx.ui.block_select import BlockDefine
-from amulet_map_editor.api.wx.ui.block_select import BlockSelect
-from amulet_map_editor.api.wx.ui.simple import SimpleDialog
 from amulet_map_editor.programs.edit.api.behaviour import BlockSelectionBehaviour
-from amulet_map_editor.programs.edit.api.behaviour import StaticSelectionBehaviour
-from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import EVT_POINT_CHANGE
-from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import PointChangeEvent
-from amulet_map_editor.programs.edit.api.behaviour.pointer_behaviour import PointerBehaviour
 
-from amulet_map_editor.programs.edit.api.events import EVT_SELECTION_CHANGE
-from amulet_map_editor.programs.edit.api.key_config import ACT_BOX_CLICK
 from amulet_map_editor.programs.edit.api.operations import DefaultOperationUI
-from amulet_map_editor.api.wx.ui.block_select.properties import (
-    PropertySelect,
-    WildcardSNBTType,
-    EVT_PROPERTIES_CHANGE,
-)
-from amulet_map_editor.programs.edit.api.events import (
-    EVT_SELECTION_CHANGE,
-)
+from amulet_map_editor.api.wx.ui.block_select.properties import EVT_PROPERTIES_CHANGE
+from amulet_map_editor.programs.edit.api.events import EVT_SELECTION_CHANGE
 
 if TYPE_CHECKING:
     from amulet.api.level import BaseLevel
